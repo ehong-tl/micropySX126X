@@ -35,23 +35,23 @@ The parameters are:
 - tcxoVoltage : TCXO input voltage in V
 - useRegulatorLDO : Use LDO regulator = True, use DC-DC regulator = False
 
-**lora.setBandwidth([bw])**  
+**lora.setBandwidth(bw)**  
 Set LoRa bandwidth in KHz.
 
-**lora.setFrequency([freq])**  
+**lora.setFrequency(freq)**  
 Set LoRa frequency in KHz.
 
-**lora.setCodingRate([cr])**  
+**lora.setCodingRate(cr)**  
 Set LoRa coding rate, 5 to 8.
 
-**lora.setPreambleLength([preambleLength])**  
+**lora.setPreambleLength(preambleLength)**  
 Set LoRa preamble length.
 
-**lora.setSpreadingFactor([sf])**  
+**lora.setSpreadingFactor(sf)**  
 Set LoRa spreading factor, 5 to 12.
 
-**lora.setOutputPower([power])**  
+**lora.setOutputPower(power)**  
 Set LoRa TX power in dBm.
 
-
-
+**lora.setSyncWord(syncWord, controlBits=0x44)**  
+Set LoRa sync word, private = 0x12, public = 0x34.
