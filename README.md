@@ -55,3 +55,27 @@ Set LoRa TX power in dBm.
 
 **lora.setSyncWord(syncWord, controlBits=0x44)**  
 Set LoRa sync word, private = 0x12, public = 0x34.
+
+**lora.setBlocking(blockingMode)**  
+Set blocking mode, default is True.
+
+**lora.setCallback(func)**  
+Set callback function upon LoRa TX or RX.
+
+**lora.events()**  
+Get LoRa callback events, SX1262.TX_DONE or SX1262.RX_DONE.
+
+**lora.getRSSI()**
+Get LoRa RX RSSI in dB.
+
+**lora.getSNR()**  
+Get LoRa RX SNR.
+
+**lora.getTimeOnAir(len)**  
+Get RX time on air according to message length, len = message length.
+
+**lora.send(data)**  
+Send LoRa message, data type must be bytes or bytearray.
+
+**lora.recv([len])**  
+Read RX LoRa message, optional parameter len = message length.
