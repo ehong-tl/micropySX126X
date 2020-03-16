@@ -37,3 +37,21 @@ The parameters are:
 
 **lora.setBandwidth([bw])**  
 Set LoRa bandwidth in KHz.
+
+**lora.setFrequency([freq])**  
+Set LoRa frequency in KHz.
+
+**lora.setCodingRate([cr])**  
+Set LoRa coding rate, 5 to 8.
+
+**lora.setPreambleLength([preambleLength])**  
+Set LoRa preamble length.
+
+**lora.setSpreadingFactor([sf])**  
+Set LoRa spreading factor, 5 to 12.
+
+**lora.setOutputPower([power])**  
+Set LoRa TX power in dBm.
+
+
+
