@@ -65,7 +65,7 @@ Set callback function upon LoRa TX or RX.
 **lora.events()**  
 Get LoRa callback events, SX1262.TX_DONE or SX1262.RX_DONE.
 
-**lora.getRSSI()**
+**lora.getRSSI()**  
 Get LoRa RX RSSI in dB.
 
 **lora.getSNR()**  
