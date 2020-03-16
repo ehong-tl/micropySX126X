@@ -20,7 +20,7 @@ lora = sx1262.SX1262('P5','P6','P7','P8')
 
 ## Methods (Similar for SX1261 and SX1268)  
 **lora.begin(freq=434.0, bw=125.0, sf=9, cr=7, syncWord=SX126X_SYNC_WORD_PRIVATE,  
-power=14, currentLimit=60.0, preambleLength=8, tcxoVoltage=1.6, useRegulatorLDO=False)**
+power=14, currentLimit=60.0, preambleLength=8, tcxoVoltage=1.6, useRegulatorLDO=False)**  
 This method is used to set LoRa configuration.
 
 The parameters are:  
