@@ -1,6 +1,6 @@
 # micropySX126X
 Micropython library for Semtech SX126X LoRa module.  
-This micropython library is ported from [RadioLib](https://github.com/jgromes/RadioLib) by jgromes.  
+This micropython library is ported and modified from [RadioLib](https://github.com/jgromes/RadioLib) by jgromes.  
 This library is tested with Pycom WiPy 3.0 and SX1262DVK1PAS dev kit.
 
 ## Constructors(Similar for SX1261 and SX1268)  
