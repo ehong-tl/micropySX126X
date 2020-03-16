@@ -35,3 +35,5 @@ The parameters are:
 - tcxoVoltage : TCXO input voltage in V
 - useRegulatorLDO : Use LDO regulator = True, use DC-DC regulator = False
 
+**lora.setBandwidth([bw])**  
+Set LoRa bandwidth in KHz.
