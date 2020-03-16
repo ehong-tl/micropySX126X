@@ -79,3 +79,7 @@ Send LoRa message, data type must be bytes or bytearray.
 
 **lora.recv([len])**  
 Read RX LoRa message, optional parameter len = message length.
+
+## Constants  
+LoRa events: SX1262.TX_DONE, SX1262.RX_DONE  
+LoRa error dictionary: SX1262.ERROR
