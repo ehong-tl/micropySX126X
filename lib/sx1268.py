@@ -95,6 +95,8 @@ class SX1268(SX126X):
             ASSERT(state)
             if callback != None:
                 super().setDio1Action(self._onTX, callback)
+            else:
+                super().clearDio1Action()
             return state
         else:
             state = super().standby()
