@@ -57,7 +57,7 @@ Set LoRa TX power in dBm.
 **lora.setSyncWord(syncWord, controlBits=0x44)**  
 Set LoRa sync word, private = 0x12, public = 0x34.
 
-**lora.setTrigger(trigger, callback=None)**
+**lora.setTrigger(trigger, callback=None)**  
 Set callback interrupt on TX/RX.  
 If trigger = True, TX/RX is set to non blocking mode and callback function will be triggered with events argument upon TX/RX events.  
 If trigger = False, TX/RX is set to blocking mode and callback function will be ignored.  
