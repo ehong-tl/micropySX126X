@@ -10,10 +10,10 @@ class SX1268(SX126X):
 
     def __init__(self, cs, irq, rst, gpio, clk='P10', mosi='P11', miso='P14'):
         super().__init__(cs, irq, rst, gpio, clk, mosi, miso)
-        self.blockingMode = True
 
     def begin(self, freq=434.0, bw=125.0, sf=9, cr=7, syncWord=SX126X_SYNC_WORD_PRIVATE,
-              power=14, currentLimit=60.0, preambleLength=8, tcxoVoltage=1.6, useRegulatorLDO=False):
+              power=14, currentLimit=60.0, preambleLength=8, tcxoVoltage=1.6, useRegulatorLDO=False,
+              trigger=False):
         state = super().begin(bw, sf, cr, syncWord, currentLimit, preambleLength, tcxoVoltage, useRegulatorLDO)
         ASSERT(state)
 
@@ -24,11 +24,15 @@ class SX1268(SX126X):
         ASSERT(state)
 
         state = super().fixPaClamping()
+        ASSERT(state)
+
+        state = self.setTrigger(trigger)
 
         return state
 
     def beginFSK(self, freq=434.0, br=48.0, freqDev=50.0, rxBw=156.2, power=14, currentLimit=60.0,
-                 preambleLength=16, dataShaping=0.5, tcxoVoltage=1.6, useRegulatorLDO=False):
+                 preambleLength=16, dataShaping=0.5, tcxoVoltage=1.6, useRegulatorLDO=False,
+                 trigger=False):
         state = super().beginFSK(br, freqDev, rxBw, currentLimit, preambleLength, dataShaping, tcxoVoltage, useRegulatorLDO)
         ASSERT(state)
 
@@ -39,6 +43,9 @@ class SX1268(SX126X):
         ASSERT(state)
 
         state = super().fixPaClamping()
+        ASSERT(state)
+
+        state = self.setTrigger(trigger)
 
         return state
 
@@ -81,29 +88,34 @@ class SX1268(SX126X):
 
         return super().writeRegister(SX126X_REG_OCP_CONFIGURATION, ocp, 1)
 
-    def setBlocking(self, mode):
-        self.blockingMode = mode
-
-    def setCallback(self, func):
-        if func == None:
-            super().clearDio1Action()
+    def setTrigger(self, trigger, callback=None):
+        self.trigger = trigger
+        if self.trigger:
+            state = super().startReceive()
+            ASSERT(state)
+            if callback != None:
+                super().setDio1Action(self._onTX, callback)
+            return state
         else:
-            super().setDio1Action(func)
-
-    def events(self):
-        return super().getIrqStatus()
+            state = super().standby()
+            ASSERT(state)
+            super().clearDio1Action()
+            return state   
 
     def recv(self, len_=0):
-        if self.blockingMode:
-            return self._receive(len_)
-        else:
+        if self.trigger:
             return self._readData(len_)
+        else:
+            return self._receive(len_)
 
     def send(self, data):
-        if self.blockingMode:
-            return self._transmit(data)
-        else:
+        if self.trigger:
             return self._startTransmit(data)
+        else:
+            return self._transmit(data)
+
+    def _events(self):
+        return super().getIrqStatus()
 
     def _receive(self, len_=0):
         state = ERR_NONE
@@ -116,7 +128,10 @@ class SX1268(SX126X):
         data = bytearray(length)
         data_mv = memoryview(data)
 
-        state = super().receive(data_mv, length)
+        try:
+            state = super().receive(data_mv, length)
+        except AssertionError as e:
+            state = list(ERROR.keys())[list(ERROR.values()).index(str(e))]
 
         if state == ERR_NONE:
             if len_ == 0:
@@ -148,7 +163,12 @@ class SX1268(SX126X):
         data = bytearray(length)
         data_mv = memoryview(data)
 
-        state = super().readData(data_mv, length)
+        try:
+            state = super().readData(data_mv, length)
+        except AssertionError as e:
+            state = list(ERROR.keys())[list(ERROR.values()).index(str(e))]
+
+        ASSERT(super().startReceive())
 
         if state == ERR_NONE:
             return bytes(data), state
@@ -163,4 +183,10 @@ class SX1268(SX126X):
             return 0, ERR_INVALID_PACKET_TYPE
 
         state = super().startTransmit(data, len(data))
-        return len(data), state     
+        return len(data), state
+
+    def _onTX(self, callback):
+        events = self._events()
+        if events & self.TX_DONE:
+            super().startReceive()
+        callback(events)

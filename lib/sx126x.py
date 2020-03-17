@@ -228,16 +228,18 @@ class SX126X:
             return ERR_UNKNOWN
 
         timeoutValue = int(float(timeout) / 15.625)
-        state = self.startReceive(timeoutValue)
+##        state = self.startReceive(timeoutValue)
+        state = self.startReceive(SX126X_RX_TIMEOUT_NONE)
         ASSERT(state)
 
         start = utime.ticks_us()
         while not self.irq.value():
-            if abs(utime.ticks_diff(start, utime.ticks_us())) > timeout:
-                self.fixImplicitTimeout()
-                self.clearIrqStatus()
-                self.standby()
-                return ERR_RX_TIMEOUT
+            yield_()
+##            if abs(utime.ticks_diff(start, utime.ticks_us())) > timeout:
+##                self.fixImplicitTimeout()
+##                self.clearIrqStatus()
+##                self.standby()
+##                return ERR_RX_TIMEOUT
 
         if self._headerType == SX126X_LORA_HEADER_IMPLICIT and self.getPacketType() == SX126X_PACKET_TYPE_LORA:
             state = self.fixImplicitTimeout()
@@ -300,8 +302,8 @@ class SX126X:
         data = [mode]
         return self.SPIwriteCommand([SX126X_CMD_SET_STANDBY], 1, data, 1)
 
-    def setDio1Action(self, func):
-        self.irq.callback(Pin.IRQ_RISING, func)
+    def setDio1Action(self, *func):
+        self.irq.callback(Pin.IRQ_RISING, *func)
 
     def clearDio1Action(self):
         self.irq = Pin(self._irq, mode=Pin.IN)

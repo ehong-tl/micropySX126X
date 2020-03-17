@@ -19,8 +19,8 @@ The parameters are:
 lora = sx1262.SX1262('P5','P6','P7','P8')
 
 ## Methods (Similar for SX1261 and SX1268)  
-**lora.begin(freq=434.0, bw=125.0, sf=9, cr=7, syncWord=SX126X_SYNC_WORD_PRIVATE,  
-power=14, currentLimit=60.0, preambleLength=8, tcxoVoltage=1.6, useRegulatorLDO=False)**  
+**lora.begin(freq=434.0, bw=125.0, sf=9, cr=7, syncWord=0x12, power=14, currentLimit=60.0  
+preambleLength=8, tcxoVoltage=1.6, useRegulatorLDO=False, trigger=False)**  
 This method is used to set LoRa configuration.
 
 The parameters are:  
@@ -34,6 +34,7 @@ The parameters are:
 - preambleLength : Preamble length
 - tcxoVoltage : TCXO input voltage in V
 - useRegulatorLDO : Use LDO regulator = True, use DC-DC regulator = False
+- trigger : Non blocking TX/RX = True, blocking TX/RX = False
 
 **lora.setBandwidth(bw)**  
 Set LoRa bandwidth in KHz.
@@ -56,14 +57,11 @@ Set LoRa TX power in dBm.
 **lora.setSyncWord(syncWord, controlBits=0x44)**  
 Set LoRa sync word, private = 0x12, public = 0x34.
 
-**lora.setBlocking(blockingMode)**  
-Set blocking mode, default is True.
-
-**lora.setCallback(func)**  
-Set callback function upon LoRa TX or RX.
-
-**lora.events()**  
-Get LoRa callback events, SX1262.TX_DONE or SX1262.RX_DONE.
+**lora.setTrigger(trigger, callback=None)**
+Set callback interrupt on TX/RX.  
+If trigger = True, TX/RX is set to non blocking mode and callback function will be triggered with events argument upon TX/RX events.  
+If trigger = False, TX/RX is set to blocking mode and callback function will be ignored.  
+if callback = None, callback trigger function will be disabled.
 
 **lora.getRSSI()**  
 Get LoRa RX RSSI in dB.

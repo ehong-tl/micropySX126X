@@ -1,8 +1,10 @@
+import utime
+
 def ASSERT(state):
     assert state == ERR_NONE, ERROR[state]
 
 def yield_():
-    utime.sleep_ms(10)
+    utime.sleep_ms(1)
 
 SX126X_FREQUENCY_STEP_SIZE = 0.9536743164
 SX126X_MAX_PACKET_LENGTH = const(255)
