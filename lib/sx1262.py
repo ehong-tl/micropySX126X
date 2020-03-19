@@ -42,7 +42,7 @@ class SX1262(SX126X):
 
     def beginFSK(self, freq=434.0, br=48.0, freqDev=50.0, rxBw=156.2, power=14, currentLimit=60.0,
                  preambleLength=16, dataShaping=0.5, tcxoVoltage=1.6, useRegulatorLDO=False,
-                 trigger=False):
+                 blocking=True):
         state = super().beginFSK(br, freqDev, rxBw, currentLimit, preambleLength, dataShaping, tcxoVoltage, useRegulatorLDO)
         ASSERT(state)
 
@@ -55,7 +55,7 @@ class SX1262(SX126X):
         state = super().fixPaClamping()
         ASSERT(state)
 
-        state = self.setTrigger(trigger)
+        state = self.setBlockingCallback(blocking)
 
         return state
 
