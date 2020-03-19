@@ -148,7 +148,7 @@ class SX126X:
         state = self.variablePacketLengthMode(SX126X_MAX_PACKET_LENGTH)
         ASSERT(state)
 
-        state = self.setDio2AsRfSwitch(False)
+        state = self.setDio2AsRfSwitch(True)
         ASSERT(state)
 
         if useRegulatorLDO:
