@@ -12,9 +12,19 @@ class SX1268(SX126X):
         super().__init__(cs, irq, rst, gpio, clk, mosi, miso)
 
     def begin(self, freq=434.0, bw=125.0, sf=9, cr=7, syncWord=SX126X_SYNC_WORD_PRIVATE,
-              power=14, currentLimit=60.0, preambleLength=8, tcxoVoltage=1.6, useRegulatorLDO=False,
-              trigger=False):
-        state = super().begin(bw, sf, cr, syncWord, currentLimit, preambleLength, tcxoVoltage, useRegulatorLDO)
+              power=14, currentLimit=60.0, preambleLength=8, implicit=False, implicitLen=0xFF,
+              crcOn=True, txIq=False, rxIq=False, tcxoVoltage=1.6, useRegulatorLDO=False,
+              blocking=True):
+        state = super().begin(bw, sf, cr, syncWord, currentLimit, preambleLength, tcxoVoltage, useRegulatorLDO, txIq, rxIq)
+        ASSERT(state)
+
+        if not implicit:
+            state = super().explicitHeader()
+        else:
+            state = super().implicitHeader(implicitLen)
+        ASSERT(state)
+
+        state = super().setCRC(crcOn)
         ASSERT(state)
 
         state = self.setFrequency(freq)
@@ -26,7 +36,7 @@ class SX1268(SX126X):
         state = super().fixPaClamping()
         ASSERT(state)
 
-        state = self.setTrigger(trigger)
+        state = self.setBlockingCallback(blocking)
 
         return state
 
@@ -88,9 +98,9 @@ class SX1268(SX126X):
 
         return super().writeRegister(SX126X_REG_OCP_CONFIGURATION, ocp, 1)
 
-    def setTrigger(self, trigger, callback=None):
-        self.trigger = trigger
-        if self.trigger:
+    def setBlockingCallback(self, blocking, callback=None):
+        self.blocking = blocking
+        if not self.blocking:
             state = super().startReceive()
             ASSERT(state)
             if callback != None:
@@ -105,13 +115,13 @@ class SX1268(SX126X):
             return state   
 
     def recv(self, len_=0):
-        if self.trigger:
+        if not self.blocking:
             return self._readData(len_)
         else:
             return self._receive(len_)
 
     def send(self, data):
-        if self.trigger:
+        if not self.blocking:
             return self._startTransmit(data)
         else:
             return self._transmit(data)

@@ -22,6 +22,9 @@ class SX126X:
         self._tcxoDelay = 0
         self._headerType = 0
         self._implicitLen = 0
+        self._txIq = 0
+        self._rxIq = 0
+        self._invertIQ = 0
 
         self._br = 0
         self._freqDev = 0
@@ -36,7 +39,7 @@ class SX126X:
         self._packetType = 0
         self._dataRate = 0
 
-    def begin(self, bw, sf, cr, syncWord, currentLimit, preambleLength, tcxoVoltage, useRegulatorLDO=False):
+    def begin(self, bw, sf, cr, syncWord, currentLimit, preambleLength, tcxoVoltage, useRegulatorLDO=False, txIq=False, rxIq=False):
         self._bwKhz = bw
         self._sf = sf
 
@@ -48,6 +51,10 @@ class SX126X:
         self._tcxoDelay = 0
         self._headerType = SX126X_LORA_HEADER_EXPLICIT
         self._implicitLen = 0xFF
+
+        self._txIq = txIq
+        self._rxIq = rxIq
+        self._invertIQ = SX126X_LORA_IQ_STANDARD
 
         state = self.reset()
         ASSERT(state)
@@ -318,7 +325,16 @@ class SX126X:
         state = ERR_NONE
         modem = self.getPacketType()
         if modem == SX126X_PACKET_TYPE_LORA:
-            state = self.setPacketParams(self._preambleLength, self._crcType, len_, self._headerType)
+            if self._txIq:
+                self._invertIQ = SX126X_LORA_IQ_INVERTED
+            else:
+                self._invertIQ = SX126X_LORA_IQ_STANDARD
+                
+            if self._headerType == SX126X_LORA_HEADER_IMPLICIT:
+                if len_ != self._implicitLen:
+                    return ERR_INVALID_PACKET_LENGTH
+                
+            state = self.setPacketParams(self._preambleLength, self._crcType, len_, self._headerType, self._invertIQ)
         elif modem == SX126X_PACKET_TYPE_GFSK:
             state = self.setPacketParamsFSK(self._preambleLengthFSK, self._crcTypeFSK, self._syncWordLength, self._addrComp, self._whitening, self._packetType, len_)
         else:
@@ -349,6 +365,21 @@ class SX126X:
         return state
 		
     def startReceive(self, timeout=SX126X_RX_TIMEOUT_INF):
+        state = ERR_NONE
+        modem = self.getPacketType()
+        if modem == SX126X_PACKET_TYPE_LORA:
+            if self._rxIq:
+                self._invertIQ = SX126X_LORA_IQ_INVERTED
+            else:
+                self._invertIQ = SX126X_LORA_IQ_STANDARD
+                
+            state = self.setPacketParams(self._preambleLength, self._crcType, self._implicitLen, self._headerType, self._invertIQ)
+        elif modem == SX126X_PACKET_TYPE_GFSK:
+            state = self.setPacketParamsFSK(self._preambleLengthFSK, self._crcTypeFSK, self._syncWordLength, self._addrComp, self._whitening, self._packetType, len_)
+        else:
+            return ERR_UNKNOWN
+        ASSERT(state)
+        
         state = self.startReceiveCommon()
         ASSERT(state)
         
@@ -405,7 +436,7 @@ class SX126X:
         state = self.clearIrqStatus()
         
         if self._headerType == SX126X_LORA_HEADER_IMPLICIT and self.getPacketType() == SX126X_PACKET_TYPE_LORA:
-            state = self.setPacketParams(self._preambleLength, self._crcType, self._implicitLen, self._headerType)
+            state = self.setPacketParams(self._preambleLength, self._crcType, self._implicitLen, self._headerType, self._invertIQ)
             ASSERT(state)
                 
         return state
@@ -523,7 +554,7 @@ class SX126X:
         modem = self.getPacketType()
         if modem == SX126X_PACKET_TYPE_LORA:
             self._preambleLength = preambleLength
-            return self.setPacketParams(self._preambleLength, self._crcType, self._implicitLen, self._headerType)
+            return self.setPacketParams(self._preambleLength, self._crcType, self._implicitLen, self._headerType, self._invertIQ)
         elif modem == SX126X_PACKET_TYPE_GFSK:
             self._preambleLengthFSK = preambleLength
             return self.setPacketParamsFSK(self._preambleLengthFSK, self._crcTypeFSK, self._syncWordLength, self._addrComp, self._whitening, self._packetType)
@@ -718,7 +749,7 @@ class SX126X:
             else:
                 self._crcType = SX126X_LORA_CRC_OFF
 
-            return self.setPacketParams(self._preambleLength, self._crcType, self._implicitLen, self._headerType)
+            return self.setPacketParams(self._preambleLength, self._crcType, self._implicitLen, self._headerType, self._invertIQ)
 
         return ERR_UNKNOWN
 
@@ -949,7 +980,7 @@ class SX126X:
         if self.getPacketType() != SX126X_PACKET_TYPE_LORA:
             return ERR_WRONG_MODEM
 
-        state = self.setPacketParams(self._preambleLength, self._crcType, len_, headerType)
+        state = self.setPacketParams(self._preambleLength, self._crcType, len_, headerType, self._invertIQ)
         ASSERT(state)
 
         self._headerType = headerType
