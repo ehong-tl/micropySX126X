@@ -18,8 +18,6 @@ The parameters are:
 
 lora = sx1262.SX1262('P5','P6','P7','P8')
 
-Return: Error state (Refer to **Constants** LoRa error dictionary)
-
 ## Methods (Similar for SX1261 and SX1268)  
 **lora.begin(freq=434.0, bw=125.0, sf=9, cr=7, syncWord=0x12, power=14, currentLimit=60.0  
 preambleLength=8, implicit=False, implicitLen=0xFF, crcOn=True, txIq=False, rxIq=False,  
@@ -44,7 +42,7 @@ The parameters are:
 - useRegulatorLDO : Use LDO regulator = True, use DC-DC regulator = False
 - blocking : Blocking TX/RX = True, non blocking TX/RX = False
 
-Return: Error state
+Return: Error state (Refer to **Constants** LoRa error dictionary)
 
 **lora.setBandwidth(bw)**  
 Set LoRa bandwidth in KHz.  
