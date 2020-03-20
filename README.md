@@ -98,6 +98,6 @@ Return: Payload length, error state
 Read RX LoRa message, optional parameter len = message length.  
 Return: Payload, error state
 
-## Constants  
+## Constants (Similar for SX1261 and SX1268)  
 LoRa events: SX1262.TX_DONE, SX1262.RX_DONE  
 LoRa error dictionary: SX1262.ERROR
