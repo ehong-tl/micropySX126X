@@ -88,7 +88,7 @@ class SX1262(SX126X):
         return super().setFrequencyRaw(freq)
 
     def setOutputPower(self, power):
-        if not ((power >= -17) and (power <= 22)):
+        if not ((power >= -9) and (power <= 22)):
             return ERR_INVALID_OUTPUT_POWER
 
         ocp = bytearray(1)
