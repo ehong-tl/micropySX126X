@@ -72,7 +72,7 @@ Return: Error state
 Set LoRa sync word, private = 0x12, public = 0x34.  
 Optional parameter controlBits, default value is 0x44.  
 e.g. syncWord = 0xAB, controlBits = 0xCD -> SX126x 2 bytes sync word = 0xACBD  
-     syncWord = 0x12, controlBits = 0x44 -> SX126x 2 bytes sync word = 0x1424  
+e.g. syncWord = 0x12, controlBits = 0x44 -> SX126x 2 bytes sync word = 0x1424  
 Return: Error state
 
 **lora.setBlockingCallback(blocking, callback=None)**  
