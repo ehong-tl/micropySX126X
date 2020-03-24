@@ -6,7 +6,10 @@ class SX126X:
 
     def __init__(self, cs, irq, rst, gpio, clk='P10', mosi='P11', miso='P14'):
         self._irq = irq
-        self.spi = SPI(0, mode=SPI.MASTER, baudrate=2000000, polarity=0, phase=0, pins=(clk, mosi, miso))
+        try:
+            self.spi = SPI(0, mode=SPI.MASTER, baudrate=2000000, pins=(clk, mosi, miso))    # Pycom variant uPy
+        except:
+            self.spi = SPI(0, baudrate=2000000, pins=(clk, mosi, miso))                     # Generic variant uPy
         self.cs = Pin(cs, mode=Pin.OUT)
         self.irq = Pin(irq, mode=Pin.IN)
         self.rst = Pin(rst, mode=Pin.OUT)
@@ -309,8 +312,11 @@ class SX126X:
         data = [mode]
         return self.SPIwriteCommand([SX126X_CMD_SET_STANDBY], 1, data, 1)
 
-    def setDio1Action(self, *func):
-        self.irq.callback(Pin.IRQ_RISING, *func)
+    def setDio1Action(self, func):
+        try:
+            self.irq.callback(trigger=Pin.IRQ_RISING, handler=func)     # Pycom variant uPy
+        except:
+            self.irq.irq(trigger=Pin.IRQ_RISING, handler=func)          # Generic variant uPy
 
     def clearDio1Action(self):
         self.irq = Pin(self._irq, mode=Pin.IN)

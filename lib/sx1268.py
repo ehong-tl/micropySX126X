@@ -10,6 +10,7 @@ class SX1268(SX126X):
 
     def __init__(self, cs, irq, rst, gpio, clk='P10', mosi='P11', miso='P14'):
         super().__init__(cs, irq, rst, gpio, clk, mosi, miso)
+        self._callbackFunction = self._dummyFunction
 
     def begin(self, freq=434.0, bw=125.0, sf=9, cr=7, syncWord=SX126X_SYNC_WORD_PRIVATE,
               power=14, currentLimit=60.0, preambleLength=8, implicit=False, implicitLen=0xFF,
@@ -104,15 +105,18 @@ class SX1268(SX126X):
             state = super().startReceive()
             ASSERT(state)
             if callback != None:
-                super().setDio1Action(self._onTX, callback)
+                self._callbackFunction = callback
+                super().setDio1Action(self._onIRQ)
             else:
+                self._callbackFunction = self._dummyFunction
                 super().clearDio1Action()
             return state
         else:
             state = super().standby()
             ASSERT(state)
+            self._callbackFunction = self._dummyFunction
             super().clearDio1Action()
-            return state   
+            return state
 
     def recv(self, len_=0):
         if not self.blocking:
@@ -197,8 +201,11 @@ class SX1268(SX126X):
         state = super().startTransmit(data, len(data))
         return len(data), state
 
-    def _onTX(self, callback):
+    def _dummyFunction(self, *args):
+        pass
+
+    def _onIRQ(self, callback):
         events = self._events()
         if events & self.TX_DONE:
             super().startReceive()
-        callback(events)
+        self._callbackFunction(events)
