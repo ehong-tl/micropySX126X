@@ -53,7 +53,7 @@ class SX1262(SX126X):
                  preambleLength=16, dataShaping=0.5, syncWord=[0x2D, 0x01], syncBitsLength=16,
                  addr=0x00, addrFilter=0, crcLength=2, crcInitial=0x1D0F, crcPolynomial=0x1021,
                  crcInverted=True, whiteningOn=True, whiteningInitial=0x0100,
-                 fixedPacketLength=False, packetLength=0xFF, preambleDetectorLength=PREAMBLE_DETECT_16,
+                 fixedPacketLength=False, packetLength=0xFF, preambleDetectorLength=self.PREAMBLE_DETECT_16,
                  tcxoVoltage=1.6, useRegulatorLDO=False,
                  blocking=True):
         state = super().beginFSK(br, freqDev, rxBw, currentLimit, preambleLength, dataShaping, preambleDetectorLength, tcxoVoltage, useRegulatorLDO)
@@ -62,11 +62,11 @@ class SX1262(SX126X):
         state = super().setSyncBits(syncWord, syncBitsLength)
         ASSERT(state)
 
-        if addrFilter == ADDR_FILT_OFF:
+        if addrFilter == self.ADDR_FILT_OFF:
             state = super().disableAddressFiltering()
-        elif addrFilter == ADDR_FILT_NODE:
+        elif addrFilter == self.ADDR_FILT_NODE:
             state = super().setNodeAddress(addr)
-        elif addrFilter == ADDR_FILT_NODE_BROAD:
+        elif addrFilter == self.ADDR_FILT_NODE_BROAD:
             state = super().setBroadcastAddress(addr)
         else:
             state = ERR_UNKNOWN
