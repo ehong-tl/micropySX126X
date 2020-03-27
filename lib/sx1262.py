@@ -6,9 +6,9 @@ _SX126X_PA_CONFIG_SX1262 = const(0x00)
 class SX1262(SX126X):
     TX_DONE = SX126X_IRQ_TX_DONE
     RX_DONE = SX126X_IRQ_RX_DONE
-    ADDR_FILT_OFF = const(0x00)
-    ADDR_FILT_NODE = const(0x01)
-    ADDR_FILT_NODE_BROAD = const(0x02)
+    ADDR_FILT_OFF = SX126X_GFSK_ADDRESS_FILT_OFF
+    ADDR_FILT_NODE = SX126X_GFSK_ADDRESS_FILT_NODE
+    ADDR_FILT_NODE_BROAD = SX126X_GFSK_ADDRESS_FILT_NODE_BROADCAST
     PREAMBLE_DETECT_OFF = SX126X_GFSK_PREAMBLE_DETECT_OFF
     PREAMBLE_DETECT_8 = SX126X_GFSK_PREAMBLE_DETECT_8
     PREAMBLE_DETECT_16 = SX126X_GFSK_PREAMBLE_DETECT_16
@@ -53,7 +53,7 @@ class SX1262(SX126X):
                  preambleLength=16, dataShaping=0.5, syncWord=[0x2D, 0x01], syncBitsLength=16,
                  addr=0x00, addrFilter=0, crcLength=2, crcInitial=0x1D0F, crcPolynomial=0x1021,
                  crcInverted=True, whiteningOn=True, whiteningInitial=0x0100,
-                 fixedPacketLength=False, packetLength=0xFF, preambleDetectorLength=self.PREAMBLE_DETECT_16,
+                 fixedPacketLength=False, packetLength=0xFF, preambleDetectorLength=SX126X_GFSK_PREAMBLE_DETECT_16,
                  tcxoVoltage=1.6, useRegulatorLDO=False,
                  blocking=True):
         state = super().beginFSK(br, freqDev, rxBw, currentLimit, preambleLength, dataShaping, preambleDetectorLength, tcxoVoltage, useRegulatorLDO)
@@ -62,11 +62,11 @@ class SX1262(SX126X):
         state = super().setSyncBits(syncWord, syncBitsLength)
         ASSERT(state)
 
-        if addrFilter == self.ADDR_FILT_OFF:
+        if addrFilter == SX126X_GFSK_ADDRESS_FILT_OFF:
             state = super().disableAddressFiltering()
-        elif addrFilter == self.ADDR_FILT_NODE:
+        elif addrFilter == SX126X_GFSK_ADDRESS_FILT_NODE:
             state = super().setNodeAddress(addr)
-        elif addrFilter == self.ADDR_FILT_NODE_BROAD:
+        elif addrFilter == SX126X_GFSK_ADDRESS_FILT_NODE_BROADCAST:
             state = super().setBroadcastAddress(addr)
         else:
             state = ERR_UNKNOWN
@@ -262,6 +262,6 @@ class SX1262(SX126X):
 
     def _onIRQ(self, callback):
         events = self._events()
-        if events & self.TX_DONE:
+        if events & SX126X_IRQ_TX_DONE:
             super().startReceive()
         self._callbackFunction(events)
