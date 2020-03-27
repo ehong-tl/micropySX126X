@@ -98,6 +98,14 @@ class SX1268(SX126X):
         ASSERT(state)
 
         return super().writeRegister(SX126X_REG_OCP_CONFIGURATION, ocp, 1)
+    
+    def setTxIq(self, txIq):
+        self._txIq = txIq
+
+    def setRxIq(self, rxIq):
+        self._rxIq = rxIq
+        if not self.blocking:
+            ASSERT(super().startReceive())
 
     def setBlockingCallback(self, blocking, callback=None):
         self.blocking = blocking

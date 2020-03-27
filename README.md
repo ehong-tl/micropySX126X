@@ -2,7 +2,7 @@
 Semtech SX126X LoRa driver for Micropython.  
 This micropython library is ported and modified from [RadioLib](https://github.com/jgromes/RadioLib) by jgromes.  
 This micropython library supports generic and Pycom variant micropython.  
-This micropython library was tested, and it is working on Pycom WiPy 3.0 with SX1262MB1PAS shield.
+This micropython library was tested and working with Pycom WiPy 3.0 and SX1262DVK1PAS evaluation board.
 
 ## Constructors (Similar for SX1261 and SX1268)  
 ***class*** **sx1262.SX1262(cs, irq, rst, gpio, clk='P10', mosi='P11', miso='P14')**  
@@ -74,6 +74,26 @@ Set LoRa sync word, private = 0x12, public = 0x34.
 Optional parameter controlBits, default value is 0x44.  
 e.g. syncWord = 0xAB, controlBits = 0xCD -> SX126x 2 bytes sync word = 0xACBD  
 e.g. syncWord = 0x12, controlBits = 0x44 -> SX126x 2 bytes sync word = 0x1424  
+Return: Error state
+
+**lora.explicitHeader()**  
+Enable LoRa explicit header mode.  
+Return: Error state
+
+**lora.implicitHeader(implicitLen)**  
+Enable LoRa implicit header mode with implicit length parameter.  
+Return: Error state
+
+**lora.setCRC(crcOn)**  
+Set CRC mode.  
+Return: Error state
+
+**lora.setTxIq(txIq)**  
+Set TX invert IQ mode.  
+Return: Error state
+
+**lora.setRxIq(rxIq)**  
+Set RX invert IQ mode.  
 Return: Error state
 
 **lora.setBlockingCallback(blocking, callback=None)**  

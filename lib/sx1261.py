@@ -105,6 +105,14 @@ class SX1261(SX126X):
 
         return super().writeRegister(SX126X_REG_OCP_CONFIGURATION, ocp, 1)
 
+    def setTxIq(self, txIq):
+        self._txIq = txIq
+
+    def setRxIq(self, rxIq):
+        self._rxIq = rxIq
+        if not self.blocking:
+            ASSERT(super().startReceive())
+
     def setBlockingCallback(self, blocking, callback=None):
         self.blocking = blocking
         if not self.blocking:
