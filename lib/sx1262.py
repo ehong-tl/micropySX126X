@@ -6,6 +6,14 @@ _SX126X_PA_CONFIG_SX1262 = const(0x00)
 class SX1262(SX126X):
     TX_DONE = SX126X_IRQ_TX_DONE
     RX_DONE = SX126X_IRQ_RX_DONE
+    ADDR_FILT_OFF = const(0x00)
+    ADDR_FILT_NODE = const(0x01)
+    ADDR_FILT_NODE_BROAD = const(0x02)
+    PREAMBLE_DETECT_OFF = SX126X_GFSK_PREAMBLE_DETECT_OFF
+    PREAMBLE_DETECT_8 = SX126X_GFSK_PREAMBLE_DETECT_8
+    PREAMBLE_DETECT_16 = SX126X_GFSK_PREAMBLE_DETECT_16
+    PREAMBLE_DETECT_24 = SX126X_GFSK_PREAMBLE_DETECT_24
+    PREAMBLE_DETECT_32 = SX126X_GFSK_PREAMBLE_DETECT_32
     ERROR = ERROR
 
     def __init__(self, cs, irq, rst, gpio, clk='P10', mosi='P11', miso='P14'):
@@ -42,9 +50,38 @@ class SX1262(SX126X):
         return state
 
     def beginFSK(self, freq=434.0, br=48.0, freqDev=50.0, rxBw=156.2, power=14, currentLimit=60.0,
-                 preambleLength=16, dataShaping=0.5, tcxoVoltage=1.6, useRegulatorLDO=False,
+                 preambleLength=16, dataShaping=0.5, syncWord=[0x2D, 0x01], syncBitsLength=16,
+                 addr=0x00, addrFilter=0, crcLength=2, crcInitial=0x1D0F, crcPolynomial=0x1021,
+                 crcInverted=True, whiteningOn=True, whiteningInitial=0x0100,
+                 fixedPacketLength=False, packetLength=0xFF, preambleDetectorLength=PREAMBLE_DETECT_16,
+                 tcxoVoltage=1.6, useRegulatorLDO=False,
                  blocking=True):
-        state = super().beginFSK(br, freqDev, rxBw, currentLimit, preambleLength, dataShaping, tcxoVoltage, useRegulatorLDO)
+        state = super().beginFSK(br, freqDev, rxBw, currentLimit, preambleLength, dataShaping, preambleDetectorLength, tcxoVoltage, useRegulatorLDO)
+        ASSERT(state)
+
+        state = super().setSyncBits(syncWord, syncBitsLength)
+        ASSERT(state)
+
+        if addrFilter == ADDR_FILT_OFF:
+            state = super().disableAddressFiltering()
+        elif addrFilter == ADDR_FILT_NODE:
+            state = super().setNodeAddress(addr)
+        elif addrFilter == ADDR_FILT_NODE_BROAD:
+            state = super().setBroadcastAddress(addr)
+        else:
+            state = ERR_UNKNOWN
+        ASSERT(state)
+
+        state = super().setCRC(crcLength, crcInitial, crcPolynomial, crcInverted)
+        ASSERT(state)
+
+        state = super().setWhitening(whiteningOn, whiteningInitial)
+        ASSERT(state)
+
+        if fixedPacketLength:
+            state = super().fixedPacketLengthMode(packetLength)
+        else:
+            state = super().variablePacketLengthMode(packetLength)
         ASSERT(state)
 
         state = self.setFrequency(freq)
@@ -110,6 +147,11 @@ class SX1262(SX126X):
 
     def setRxIq(self, rxIq):
         self._rxIq = rxIq
+        if not self.blocking:
+            ASSERT(super().startReceive())
+
+    def setPreambleDetectorLength(self, preambleDetectorLength):
+        self._preambleDetectorLength = preambleDetectorLength
         if not self.blocking:
             ASSERT(super().startReceive())
 

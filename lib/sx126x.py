@@ -41,6 +41,8 @@ class SX126X:
         self._whitening = 0
         self._packetType = 0
         self._dataRate = 0
+        self._packetLength = 0
+        self._preambleDetectorLength = 0
 
     def begin(self, bw, sf, cr, syncWord, currentLimit, preambleLength, tcxoVoltage, useRegulatorLDO=False, txIq=False, rxIq=False):
         self._bwKhz = bw
@@ -100,7 +102,7 @@ class SX126X:
 
         return state
 
-    def beginFSK(self, br, freqDev, rxBw, currentLimit, preambleLength, dataShaping, tcxoVoltage, useRegulatorLDO=False):
+    def beginFSK(self, br, freqDev, rxBw, currentLimit, preambleLength, dataShaping, preambleDetectorLength, tcxoVoltage, useRegulatorLDO=False):
         self._br = 21333
         self._freqDev = 52428
         self._rxBw = SX126X_GFSK_RX_BW_156_2
@@ -109,6 +111,7 @@ class SX126X:
         self._crcTypeFSK = SX126X_GFSK_CRC_2_BYTE_INV
         self._preambleLengthFSK = preambleLength
         self._addrComp = SX126X_GFSK_ADDRESS_FILT_OFF
+        self._preambleDetectorLength = preambleDetectorLength
 
         state = self.reset()
         ASSERT(state)
@@ -342,7 +345,11 @@ class SX126X:
                 
             state = self.setPacketParams(self._preambleLength, self._crcType, len_, self._headerType, self._invertIQ)
         elif modem == SX126X_PACKET_TYPE_GFSK:
-            state = self.setPacketParamsFSK(self._preambleLengthFSK, self._crcTypeFSK, self._syncWordLength, self._addrComp, self._whitening, self._packetType, len_)
+            if self._packetType == SX126X_GFSK_PACKET_FIXED:
+                if len_ != self._packetLength:
+                    return ERR_INVALID_PACKET_LENGTH
+                
+            state = self.setPacketParamsFSK(self._preambleLengthFSK, self._crcTypeFSK, self._syncWordLength, self._addrComp, self._whitening, self._packetType, len_, self._preambleDetectorLength)
         else:
             return ERR_UNKNOWN
         ASSERT(state)
@@ -381,7 +388,7 @@ class SX126X:
                 
             state = self.setPacketParams(self._preambleLength, self._crcType, self._implicitLen, self._headerType, self._invertIQ)
         elif modem == SX126X_PACKET_TYPE_GFSK:
-            pass
+            state = self.setPacketParamsFSK(self._preambleLengthFSK, self._crcTypeFSK, self._syncWordLength, self._addrComp, self._whitening, self._packetType, self._packetLength, self._preambleDetectorLength)
         else:
             return ERR_UNKNOWN
         ASSERT(state)
@@ -534,7 +541,7 @@ class SX126X:
             ASSERT(state)
 
             self._syncWordLength = len_ * 8
-            state = self.setPacketParamsFSK(self._preambleLengthFSK, self._crcTypeFSK, self._syncWordLength, self._addrComp, self._whitening, self._packetType)
+            state = self.setPacketParamsFSK(self._preambleLengthFSK, self._crcTypeFSK, self._syncWordLength, self._addrComp, self._whitening, self._packetType, self._packetLength, self._preambleDetectorLength)
 
             return state
 
@@ -563,7 +570,7 @@ class SX126X:
             return self.setPacketParams(self._preambleLength, self._crcType, self._implicitLen, self._headerType, self._invertIQ)
         elif modem == SX126X_PACKET_TYPE_GFSK:
             self._preambleLengthFSK = preambleLength
-            return self.setPacketParamsFSK(self._preambleLengthFSK, self._crcTypeFSK, self._syncWordLength, self._addrComp, self._whitening, self._packetType)
+            return self.setPacketParamsFSK(self._preambleLengthFSK, self._crcTypeFSK, self._syncWordLength, self._addrComp, self._whitening, self._packetType, self._packetLength, self._preambleDetectorLength)
 
         return ERR_UNKNOWN
 
@@ -680,7 +687,7 @@ class SX126X:
         ASSERT(state)
 
         self._syncWordLength = bitsLen
-        state = self.setPacketParamsFSK(self._preambleLengthFSK, self._crcTypeFSK, self._syncWordLength, self._addrComp, self._whitening, self._packetType)
+        state = self.setPacketParamsFSK(self._preambleLengthFSK, self._crcTypeFSK, self._syncWordLength, self._addrComp, self._whitening, self._packetType, self._packetLength, self._preambleDetectorLength)
 
         return state
 
@@ -690,7 +697,7 @@ class SX126X:
 
         self._addrComp = SX126X_GFSK_ADDRESS_FILT_NODE
 
-        state = self.setPacketParamsFSK(self._preambleLengthFSK, self._crcTypeFSK, self._syncWordLength, self._addrComp, self._whitening, self._packetType)
+        state = self.setPacketParamsFSK(self._preambleLengthFSK, self._crcTypeFSK, self._syncWordLength, self._addrComp, self._whitening, self._packetType, self._packetLength, self._preambleDetectorLength)
         ASSERT(state)
 
         state = self.writeRegister(SX126X_REG_NODE_ADDRESS, [nodeAddr], 1)
@@ -702,10 +709,10 @@ class SX126X:
             return ERR_WRONG_MODEM
 
         self._addrComp = SX126X_GFSK_ADDRESS_FILT_NODE_BROADCAST
-        state = self.setPacketParamsFSK(self._preambleLengthFSK, self._crcTypeFSK, self._syncWordLength, self._addrComp, self._whitening, self._packetType)
+        state = self.setPacketParamsFSK(self._preambleLengthFSK, self._crcTypeFSK, self._syncWordLength, self._addrComp, self._whitening, self._packetType, self._packetLength, self._preambleDetectorLength)
         ASSERT(state)
 
-        state = writeRegister(SX126X_REG_BROADCAST_ADDRESS, [broadAddr], 1)
+        state = self.writeRegister(SX126X_REG_BROADCAST_ADDRESS, [broadAddr], 1)
 
         return state
 
@@ -714,7 +721,7 @@ class SX126X:
             return ERR_WRONG_MODEM
 
         self._addrComp = SX126X_GFSK_ADDRESS_FILT_OFF
-        return self.setPacketParamsFSK(self._preambleLengthFSK, self._crcTypeFSK, self._syncWordLength, self._addrComp, self._whitening)
+        return self.setPacketParamsFSK(self._preambleLengthFSK, self._crcTypeFSK, self._syncWordLength, self._addrComp, self._whitening, self._packetType, self._packetLength, self._preambleDetectorLength)
 
     def setCRC(self, len_, initial=0x1D0F, polynomial=0x1021, inverted=True):
         modem = self.getPacketType()
@@ -735,7 +742,7 @@ class SX126X:
             else:
                 return ERR_INVALID_CRC_CONFIGURATION
 
-            state = self.setPacketParamsFSK(self._preambleLengthFSK, self._crcTypeFSK, self._syncWordLength, self._addrComp, self._whitening, self._packetType)
+            state = self.setPacketParamsFSK(self._preambleLengthFSK, self._crcTypeFSK, self._syncWordLength, self._addrComp, self._whitening, self._packetType, self._packetLength, self._preambleDetectorLength)
             ASSERT(state)
 
             data = [int((initial >> 8) & 0xFF), int(initial & 0xFF)]
@@ -767,7 +774,7 @@ class SX126X:
         if enabled != True:
             self._whitening = SX126X_GFSK_WHITENING_OFF
 
-            state = self.setPacketParamsFSK(self._preambleLengthFSK, self._crcTypeFSK, self._syncWordLength, self._addrComp, self._whitening, self._packetType)
+            state = self.setPacketParamsFSK(self._preambleLengthFSK, self._crcTypeFSK, self._syncWordLength, self._addrComp, self._whitening, self._packetType, self._packetLength, self._preambleDetectorLength)
             ASSERT(state)
         else:
             self._whitening = SX126X_GFSK_WHITENING_ON
@@ -780,7 +787,7 @@ class SX126X:
             state = self.writeRegister(SX126X_REG_WHITENING_INITIAL_MSB, data2, 2)
             ASSERT(state)
 
-            state = self.setPacketParamsFSK(self._preambleLengthFSK, self._crcTypeFSK, self._syncWordLength, self._addrComp, self._whitening, self._packetType)
+            state = self.setPacketParamsFSK(self._preambleLengthFSK, self._crcTypeFSK, self._syncWordLength, self._addrComp, self._whitening, self._packetType, self._packetLength, self._preambleDetectorLength)
             ASSERT(state)
         return state
 
@@ -976,10 +983,11 @@ class SX126X:
         if self.getPacketType() != SX126X_PACKET_TYPE_GFSK:
             return ERR_WRONG_MODEM
 
-        state = self.setPacketParamsFSK(self._preambleLengthFSK, self._crcTypeFSK, self._syncWordLength, self._addrComp, self._whitening, mode, len_)
+        state = self.setPacketParamsFSK(self._preambleLengthFSK, self._crcTypeFSK, self._syncWordLength, self._addrComp, self._whitening, mode, len_, self._preambleDetectorLength)
         ASSERT(state)
 
         self._packetType = mode
+        self._packetLength = len_
         return state
 
     def setHeaderType(self, headerType, len_=0xFF):
