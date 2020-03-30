@@ -159,7 +159,7 @@ The parameters are:
 
 Return: Status
 
-**S1262.setBitRate(br)**  
+**SX1262.setBitRate(br)**  
 Set FSK bit rate in kbps.  
 Return: Status
 
@@ -185,7 +185,7 @@ Return: Status
 Set FSK preamble length.  
 Return: Status
 
-**Sx1262.setPreambleDetectorLength(preambleDetectorLength)**  
+**SX1262.setPreambleDetectorLength(preambleDetectorLength)**  
 Set minimum preamble detection length, refer to **Constants** FSK preamble detector length.  
 
 **SX1262.setNodeAddress(addr)**  
@@ -213,12 +213,12 @@ Set FSK whitening.
 initial = Initial value for whitening LFSR  
 Return: Status
 
-**S1262.fixedPacketLengthMode(len)**  
+**SX1262.fixedPacketLengthMode(len)**  
 Set FSK fixed packet length mode.  
 len = Packet length in bytes  
 Return: Status
 
-**S1262.variablePacketLengthMode(maxLen)**  
+**SX1262.variablePacketLengthMode(maxLen)**  
 Set FSK variable packet length mode.  
 maxLen = Max packet length in bytes  
 Return: Status
