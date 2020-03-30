@@ -219,7 +219,7 @@ len = Packet length in bytes
 Return: Status
 
 **S1262.variablePacketLengthMode(maxLen)**  
-Set FSK fixed packet length mode.  
+Set FSK variable packet length mode.  
 maxLen = Max packet length in bytes  
 Return: Status
 
