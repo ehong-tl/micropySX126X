@@ -14,7 +14,7 @@ class SX1262(SX126X):
     PREAMBLE_DETECT_16 = SX126X_GFSK_PREAMBLE_DETECT_16
     PREAMBLE_DETECT_24 = SX126X_GFSK_PREAMBLE_DETECT_24
     PREAMBLE_DETECT_32 = SX126X_GFSK_PREAMBLE_DETECT_32
-    ERROR = ERROR
+    STATUS = ERROR
 
     def __init__(self, cs, irq, rst, gpio, clk='P10', mosi='P11', miso='P14'):
         super().__init__(cs, irq, rst, gpio, clk, mosi, miso)
@@ -51,7 +51,7 @@ class SX1262(SX126X):
 
     def beginFSK(self, freq=434.0, br=48.0, freqDev=50.0, rxBw=156.2, power=14, currentLimit=60.0,
                  preambleLength=16, dataShaping=0.5, syncWord=[0x2D, 0x01], syncBitsLength=16,
-                 addr=0x00, addrFilter=0, crcLength=2, crcInitial=0x1D0F, crcPolynomial=0x1021,
+                 addrFilter=SX126X_GFSK_ADDRESS_FILT_OFF, addr=0x00, crcLength=2, crcInitial=0x1D0F, crcPolynomial=0x1021,
                  crcInverted=True, whiteningOn=True, whiteningInitial=0x0100,
                  fixedPacketLength=False, packetLength=0xFF, preambleDetectorLength=SX126X_GFSK_PREAMBLE_DETECT_16,
                  tcxoVoltage=1.6, useRegulatorLDO=False,
