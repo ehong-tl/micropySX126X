@@ -205,7 +205,7 @@ class SX1261(SX126X):
         except AssertionError as e:
             state = list(ERROR.keys())[list(ERROR.values()).index(str(e))]
 
-        if state == ERR_NONE:
+        if state == ERR_NONE or state == ERR_CRC_MISMATCH:
             if len_ == 0:
                 length = super().getPacketLength(False)
                 data = data[:length]
@@ -242,7 +242,7 @@ class SX1261(SX126X):
 
         ASSERT(super().startReceive())
 
-        if state == ERR_NONE:
+        if state == ERR_NONE or state == ERR_CRC_MISMATCH:
             return bytes(data), state
 
         else:

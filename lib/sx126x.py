@@ -165,9 +165,12 @@ class SX126X:
         return state
 
     def reset(self, verify=True):
+        self.rst.value(1)
+        utime.sleep_us(150)
         self.rst.value(0)
         utime.sleep_us(150)
         self.rst.value(1)
+        utime.sleep_us(150)
 
         if not verify:
             return ERR_NONE
