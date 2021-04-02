@@ -6,6 +6,7 @@ Tested with:
 1. WiPy3.0 + Semtech SX1262MB1PAS shield (LoRa)
 2. WiPy3.0 + Ebyte E22-400M22S (LoRa)
 3. WiPy3.0 + Ebyte E22-400M30S (LoRa) - Built-in 10dB amplifier, eg. SX1268.setOutputPower(20) = 30dBm output, SX1268.setOutputPower(0) = 10 dBm output
+4. [LilyGO&#174; T-Echo](https://github.com/lyusupov/POST_TEcho)
 
 ## Constructors (Similar for SX1261 and SX1268)  
 ***class*** **sx1262.SX1262(cs, irq, rst, gpio, clk='P10', mosi='P11', miso='P14')**  
