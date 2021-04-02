@@ -1,7 +1,7 @@
 # micropySX126X
-Semtech SX126X LoRa driver for Micropython.  
-This micropython library is ported and modified from [RadioLib](https://github.com/jgromes/RadioLib) by jgromes.  
-This micropython library supports generic and Pycom variant micropython.  
+Semtech SX126X LoRa driver for Micropython and CircuitPython.  
+This library is ported and modified from [RadioLib](https://github.com/jgromes/RadioLib) by jgromes.  
+This library supports generic and Pycom variant micropython as well as CircuitPython.  
 Tested with:
 1. WiPy3.0 + Semtech SX1262MB1PAS shield (LoRa)
 2. WiPy3.0 + Ebyte E22-400M22S (LoRa)
