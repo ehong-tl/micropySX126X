@@ -174,11 +174,11 @@ class SX1261(SX126X):
             super().clearDio1Action()
             return state
 
-    def recv(self, len_=0):
+    def recv(self, len=0, timeout_en=False, timeout_ms=0):
         if not self.blocking:
-            return self._readData(len_)
+            return self._readData(len)
         else:
-            return self._receive(len_)
+            return self._receive(len, timeout_en, timeout_ms)
 
     def send(self, data):
         if not self.blocking:
@@ -189,7 +189,7 @@ class SX1261(SX126X):
     def _events(self):
         return super().getIrqStatus()
 
-    def _receive(self, len_=0):
+    def _receive(self, len_=0, timeout_en=False, timeout_ms=0):
         state = ERR_NONE
         
         length = len_
@@ -201,7 +201,7 @@ class SX1261(SX126X):
         data_mv = memoryview(data)
 
         try:
-            state = super().receive(data_mv, length)
+            state = super().receive(data_mv, length, timeout_en, timeout_ms)
         except AssertionError as e:
             state = list(ERROR.keys())[list(ERROR.values()).index(str(e))]
 

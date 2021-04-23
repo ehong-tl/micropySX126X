@@ -282,7 +282,7 @@ class SX126X:
 
         return state
 
-    def receive(self, data, len_):
+    def receive(self, data, len_, timeout_en, timeout_ms):
         state = self.standby()
         ASSERT(state)
 
@@ -301,19 +301,28 @@ class SX126X:
         else:
             return ERR_UNKNOWN
 
-        timeoutValue = int(float(timeout) / 15.625)
-##        state = self.startReceive(timeoutValue)
-        state = self.startReceive(SX126X_RX_TIMEOUT_NONE)
+        if timeout_ms == 0:
+            pass
+        else:
+            timeout = timeout_ms * 1000
+
+        if timeout_en:
+            timeoutValue = int(float(timeout) / 15.625)
+        else:
+            timeoutValue = SX126X_RX_TIMEOUT_NONE
+            
+        state = self.startReceive(timeoutValue)
         ASSERT(state)
 
         start = ticks_us()
         while not self.irq.value():
             yield_()
-##            if abs(ticks_diff(start, ticks_us())) > timeout:
-##                self.fixImplicitTimeout()
-##                self.clearIrqStatus()
-##                self.standby()
-##                return ERR_RX_TIMEOUT
+            if timeout_en:
+                if abs(ticks_diff(start, ticks_us())) > timeout:
+                    self.fixImplicitTimeout()
+                    self.clearIrqStatus()
+                    self.standby()
+                    return ERR_RX_TIMEOUT
 
         if self._headerType == SX126X_LORA_HEADER_IMPLICIT and self.getPacketType() == SX126X_PACKET_TYPE_LORA:
             state = self.fixImplicitTimeout()
