@@ -47,11 +47,14 @@ Get RX time on air according to message length, len = message length.
 Return: Time on air value
 
 **SX1262.send(data)**  
-Send LoRa message, data type must be bytes or bytearray.  
+Send message, data type must be bytes or bytearray.  
 Return: Payload length, status
 
-**SX1262.recv([len])**  
-Read RX LoRa message, optional parameter len = message length.  
+**SX1262.recv(len=0, timeout_en=False, timeout_ms=0)**  
+Read RX message.
+len = Message length, if 0, default to SX126X_MAX_PACKET_LENGTH
+timeout_en = Enable RX timeout, if False, function blocking indefinitely until message received (Only in blocking mode)
+timeout_ms = RX timeout in ms, 0 means timeout = 100 LoRa symbols length for LoRa or timeout = 500% expected time-on-air for FSK  (Only in blocking mode)
 Return: Payload, status
 
 ### LoRa  
