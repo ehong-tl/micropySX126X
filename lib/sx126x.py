@@ -957,7 +957,7 @@ class SX126X:
             return ERR_WRONG_MODEM
 
         self._ldroAuto = True
-        return ERR_NONE
+        return self.setModulationParams(self._sf, self._bw, self._cr, self._ldro)
 
     def setTCXO(self, voltage, delay=5000):
         self.standby()
