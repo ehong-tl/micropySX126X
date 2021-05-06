@@ -114,6 +114,14 @@ Return: Status
 Enable LoRa implicit header mode with implicit length parameter.  
 Return: Status
 
+**SX1262.forceLDRO(enable)**  
+Force enable Low Data Rate Optimization.  
+Return: Status
+
+**SX1262.autoLDRO()**  
+Enable auto Low Data Rate Optimization.  
+Return Status
+
 **SX1262.setCRC(crcOn)**  
 Set LoRa CRC mode.  
 Return: Status
