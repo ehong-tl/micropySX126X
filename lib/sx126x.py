@@ -266,6 +266,7 @@ class SX126X:
 
         start = ticks_us()
         while not self.irq.value():
+            yield_()
             if abs(ticks_diff(start, ticks_us())) > timeout:
                 self.clearIrqStatus()
                 self.standby()
@@ -1254,6 +1255,7 @@ class SX126X:
 
           start = ticks_ms()
           while self.gpio.value():
+              yield_()
               if abs(ticks_diff(start, ticks_ms())) >= timeout:
                   return ERR_SPI_CMD_TIMEOUT
 
@@ -1267,6 +1269,7 @@ class SX126X:
 
           start = ticks_ms()
           while self.gpio.value:
+              yield_()
               if abs(ticks_diff(start, ticks_ms())) >= timeout:
                   self.cs.value = True
                   self.spi.unlock()
@@ -1330,6 +1333,7 @@ class SX126X:
             start = ticks_ms()
             if implementation.name == 'micropython':
               while self.gpio.value():
+                  yield_()
                   if abs(ticks_diff(start, ticks_ms())) >= timeout:
                       status =  SX126X_STATUS_CMD_TIMEOUT
                       break
