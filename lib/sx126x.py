@@ -77,6 +77,7 @@ class SX126X:
         self._txIq = 0
         self._rxIq = 0
         self._invertIQ = 0
+        self._ldroAuto = True
 
         self._br = 0
         self._freqDev = 0
@@ -581,7 +582,7 @@ class SX126X:
             return ERR_INVALID_BANDWIDTH
 
         self._bwKhz = bw
-        return self.setModulationParams(self._sf, self._bw, self._cr)
+        return self.setModulationParams(self._sf, self._bw, self._cr, self._ldro)
 
     def setSpreadingFactor(self, sf):
         if self.getPacketType() != SX126X_PACKET_TYPE_LORA:
@@ -591,7 +592,7 @@ class SX126X:
             return ERR_INVALID_SPREADING_FACTOR
 
         self._sf = sf
-        return self.setModulationParams(self._sf, self._bw, self._cr)
+        return self.setModulationParams(self._sf, self._bw, self._cr, self._ldro)
 
     def setCodingRate(self, cr):
         if self.getPacketType() != SX126X_PACKET_TYPE_LORA:
@@ -601,7 +602,7 @@ class SX126X:
             return ERR_INVALID_CODING_RATE
 
         self._cr = cr - 4
-        return self.setModulationParams(self._sf, self._bw, self._cr)
+        return self.setModulationParams(self._sf, self._bw, self._cr, self._ldro)
 
     def setSyncWord(self, syncWord, *args):
         if self.getPacketType() == SX126X_PACKET_TYPE_LORA:
@@ -943,6 +944,21 @@ class SX126X:
     def setEncoding(self, encoding):
         return self.setWhitening(encoding)
 
+    def forceLDRO(self, enable):
+        if self.getPacketType() != SX126X_PACKET_TYPE_LORA:
+            return ERR_WRONG_MODEM
+
+        self._ldroAuto = False
+        self._ldro = enable
+        return self.setModulationParams(self._sf, self._bw, self._cr, self._ldro)
+
+    def autoLDRO(self):
+        if self.getPacketType() != SX126X_PACKET_TYPE_LORA:
+            return ERR_WRONG_MODEM
+
+        self._ldroAuto = True
+        return ERR_NONE
+
     def setTCXO(self, voltage, delay=5000):
         self.standby()
 
@@ -1082,8 +1098,8 @@ class SX126X:
 
         return state
 
-    def setModulationParams(self, sf, bw, cr, ldro=0xFF):
-        if ldro == 0xFF:
+    def setModulationParams(self, sf, bw, cr, ldro):
+        if self._ldroAuto:
             symbolLength = float((1 << self._sf)) / float(self._bwKhz)
             if symbolLength >= 16.0:
                 self._ldro = SX126X_LORA_LOW_DATA_RATE_OPTIMIZE_ON
