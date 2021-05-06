@@ -529,10 +529,12 @@ class SX126X:
         ASSERT(state)
         
         state = self.clearIrqStatus()
-        
-        if self._headerType == SX126X_LORA_HEADER_IMPLICIT and self.getPacketType() == SX126X_PACKET_TYPE_LORA:
+
+        modem = self.getPacketType()
+        if modem == SX126X_PACKET_TYPE_LORA:
             state = self.setPacketParams(self._preambleLength, self._crcType, self._implicitLen, self._headerType, self._invertIQ)
-            ASSERT(state)
+        elif modem == SX126X_PACKET_TYPE_GFSK:
+            state = self.setPacketParamsFSK(self._preambleLengthFSK, self._crcTypeFSK, self._syncWordLength, self._addrComp, self._whitening, self._packetType)
                 
         return state
             
