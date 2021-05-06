@@ -1340,6 +1340,7 @@ class SX126X:
 
             if implementation.name == 'circuitpython':
               while self.gpio.value:
+                  yield_()
                   if abs(ticks_diff(start, ticks_ms())) >= timeout:
                       status =  SX126X_STATUS_CMD_TIMEOUT
                       break
