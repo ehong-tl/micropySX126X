@@ -542,7 +542,6 @@ class SX126X:
         irq = self.getIrqStatus()
         crcState = ERR_NONE
         if irq & SX126X_IRQ_CRC_ERR or irq & SX126X_IRQ_HEADER_ERR:
-            self.clearIrqStatus()
             crcState = ERR_CRC_MISMATCH
                 
         length = len_
@@ -1257,6 +1256,7 @@ class SX126X:
           while self.gpio.value():
               yield_()
               if abs(ticks_diff(start, ticks_ms())) >= timeout:
+                  self.cs.value(1)
                   return ERR_SPI_CMD_TIMEOUT
 
           for i in range(cmdLen):
