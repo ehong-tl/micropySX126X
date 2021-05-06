@@ -120,7 +120,7 @@ Return: Status
 
 **SX1262.autoLDRO()**  
 Enable auto Low Data Rate Optimization.  
-Return Status
+Return: Status
 
 **SX1262.setCRC(crcOn)**  
 Set LoRa CRC mode.  
