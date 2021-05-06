@@ -965,6 +965,9 @@ class SX126X:
         if self.getDeviceErrors() & SX126X_XOSC_START_ERR:
             self.clearDeviceErrors()
 
+        if abs(voltage - 0.0) <= 0.001:
+            return self.reset()
+
         data = [0,0,0,0]
         if abs(voltage - 1.6) <= 0.001:
             data[0] = SX126X_DIO3_OUTPUT_1_6
