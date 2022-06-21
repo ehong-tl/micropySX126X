@@ -1283,7 +1283,7 @@ class SX126X:
                   return ERR_SPI_CMD_TIMEOUT
 
           for i in range(cmdLen):
-              self.spi.write(cmd[i])
+              self.spi.write(bytes(cmd[i]))
 
         if implementation.name == 'circuitpython':
           while not self.spi.try_lock():
@@ -1308,7 +1308,7 @@ class SX126X:
         if write:
             for i in range(numBytes):
                 if implementation.name == 'micropython':
-                  in_ = self.spi.read(1, write=dataOut[i])
+                  in_ = self.spi.read(1, dataOut[i])
 
                 if implementation.name == 'circuitpython':
                   self.spi.write_readinto(bytes([dataOut[i]]), in_)
@@ -1323,7 +1323,7 @@ class SX126X:
                     break
         else:
             if implementation.name == 'micropython':
-              in_ = self.spi.read(1, write=SX126X_CMD_NOP)
+              in_ = self.spi.read(1, SX126X_CMD_NOP)
 
             if implementation.name == 'circuitpython':
               self.spi.readinto(in_)
@@ -1337,7 +1337,7 @@ class SX126X:
             else:
                 if implementation.name == 'micropython':
                   for i in range(numBytes):
-                      dataIn[i] = self.spi.read(1, write=SX126X_CMD_NOP)[0]
+                      dataIn[i] = self.spi.read(1, SX126X_CMD_NOP)[0]
 
                 if implementation.name == 'circuitpython':
                   for i in range(numBytes):
