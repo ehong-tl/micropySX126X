@@ -43,7 +43,7 @@ class SX126X:
           try:
               self.spi = SPI(0, mode=SPI.MASTER, baudrate=2000000, pins=(clk, mosi, miso))  # Pycom variant uPy
           except:
-              self.spi = SPI(0, baudrate=2000000, pins=(clk, mosi, miso))                   # Generic variant uPy
+              self.spi = SPI(0, baudrate=2000000, sck=Pin(clk), mosi=Pin(mosi), miso=Pin(miso))                   # Generic variant uPy
           self.cs = Pin(cs, mode=Pin.OUT)
           self.irq = Pin(irq, mode=Pin.IN)
           self.rst = Pin(rst, mode=Pin.OUT)
