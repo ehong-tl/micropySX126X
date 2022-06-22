@@ -9,7 +9,7 @@ def cb(events):
     elif events & SX1262.TX_DONE:
         print('TX done.')
 
-sx = SX1262(cs='P5',irq='P6',rst='P7',gpio='P8')
+sx = SX1262(spi_bus=1, clk=10, mosi=11, miso=12, cs=3, irq=20, rst=15, gpio=2)
 
 # LoRa
 sx.begin(freq=923, bw=500.0, sf=12, cr=8, syncWord=0x12,

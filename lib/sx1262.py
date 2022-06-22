@@ -16,8 +16,8 @@ class SX1262(SX126X):
     PREAMBLE_DETECT_32 = SX126X_GFSK_PREAMBLE_DETECT_32
     STATUS = ERROR
 
-    def __init__(self, cs, irq, rst, gpio, clk='P10', mosi='P11', miso='P14'):
-        super().__init__(cs, irq, rst, gpio, clk, mosi, miso)
+    def __init__(self, spi_bus, clk, mosi, miso, cs, irq, rst, gpio):
+        super().__init__(spi_bus, clk, mosi, miso, cs, irq, rst, gpio)
         self._callbackFunction = self._dummyFunction
 
     def begin(self, freq=434.0, bw=125.0, sf=9, cr=7, syncWord=SX126X_SYNC_WORD_PRIVATE,

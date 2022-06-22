@@ -37,13 +37,13 @@ if implementation.name == 'circuitpython':
 
 class SX126X:
 
-    def __init__(self, cs, irq, rst, gpio, clk='P10', mosi='P11', miso='P14'):
+    def __init__(self, spi_bus, clk, mosi, miso, cs, irq, rst, gpio):
         self._irq = irq
         if implementation.name == 'micropython':
           try:
-              self.spi = SPI(0, mode=SPI.MASTER, baudrate=2000000, pins=(clk, mosi, miso))  # Pycom variant uPy
+              self.spi = SPI(spi_bus, mode=SPI.MASTER, baudrate=2000000, pins=(clk, mosi, miso))        # Pycom variant uPy
           except:
-              self.spi = SPI(0, baudrate=2000000, sck=Pin(clk), mosi=Pin(mosi), miso=Pin(miso))                   # Generic variant uPy
+              self.spi = SPI(spi_bus, baudrate=2000000, sck=Pin(clk), mosi=Pin(mosi), miso=Pin(miso))   # Generic variant uPy
           self.cs = Pin(cs, mode=Pin.OUT)
           self.irq = Pin(irq, mode=Pin.IN)
           self.rst = Pin(rst, mode=Pin.OUT)
@@ -1283,7 +1283,7 @@ class SX126X:
                   return ERR_SPI_CMD_TIMEOUT
 
           for i in range(cmdLen):
-              self.spi.write(bytes(cmd[i]))
+              self.spi.write(bytes([cmd[i]]))
 
         if implementation.name == 'circuitpython':
           while not self.spi.try_lock():
@@ -1308,7 +1308,10 @@ class SX126X:
         if write:
             for i in range(numBytes):
                 if implementation.name == 'micropython':
-                  in_ = self.spi.read(1, dataOut[i])
+                    try:
+                        in_ = self.spi.read(1, dataOut[i])
+                    except:
+                        in_ = self.spi.read(1, write=dataOut[i])
 
                 if implementation.name == 'circuitpython':
                   self.spi.write_readinto(bytes([dataOut[i]]), in_)
@@ -1323,7 +1326,10 @@ class SX126X:
                     break
         else:
             if implementation.name == 'micropython':
-              in_ = self.spi.read(1, SX126X_CMD_NOP)
+                try:
+                    in_ = self.spi.read(1, SX126X_CMD_NOP)
+                except:
+                    in_ = self.spi.read(1, write=SX126X_CMD_NOP)
 
             if implementation.name == 'circuitpython':
               self.spi.readinto(in_)
@@ -1336,8 +1342,11 @@ class SX126X:
                 status = SX126X_STATUS_SPI_FAILED
             else:
                 if implementation.name == 'micropython':
-                  for i in range(numBytes):
-                      dataIn[i] = self.spi.read(1, SX126X_CMD_NOP)[0]
+                    for i in range(numBytes):
+                        try:
+                            dataIn[i] = self.spi.read(1, SX126X_CMD_NOP)[0]
+                        except:
+                            dataIn[i] = self.spi.read(1, write=SX126X_CMD_NOP)[0]
 
                 if implementation.name == 'circuitpython':
                   for i in range(numBytes):

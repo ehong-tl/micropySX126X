@@ -9,17 +9,18 @@ Tested with:
 4. [LilyGO&#174; T-Echo](https://github.com/lyusupov/POST_TEcho)
 
 ## Constructors (Similar for SX1261 and SX1268)  
-***class*** **sx1262.SX1262(cs, irq, rst, gpio, clk='P10', mosi='P11', miso='P14')**  
+***class*** **sx1262.SX1262(spi_bus, clk, mosi, miso, cs, irq, rst, gpio)**  
 Create and initialize SX1262 object.
 
 The parameters are:  
+- spi_bus : SPI bus ID
+- clk : SPI CLK pin
+- mosi : SPI MOSI pin
+- miso : SPI MISO pin
 - cs : NSS pin
 - irq : DIO1 pin
 - rst : RESET pin
 - gpio : BUSY pin
-- clk : SPI CLK pin
-- mosi : SPI MOSI pin
-- miso : SPI MISO pin
 
 ## Methods (Similar for SX1261 and SX1268)  
 
