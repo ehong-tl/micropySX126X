@@ -7,6 +7,7 @@ Tested with:
 2. WiPy3.0 + Ebyte E22-400M22S (LoRa)
 3. WiPy3.0 + Ebyte E22-400M30S (LoRa) - Built-in 10dB amplifier, eg. SX1268.setOutputPower(20) = 30dBm output, SX1268.setOutputPower(0) = 10 dBm output
 4. [LilyGO&#174; T-Echo](https://github.com/lyusupov/POST_TEcho)
+5. Raspberry Pi Pico + [Waveshare SX126x Pico LoRa HAT](https://www.waveshare.com/pico-lora-sx1262-868m.htm)
 
 ## Constructors (Similar for SX1261 and SX1268)  
 ***class*** **sx1262.SX1262(spi_bus, clk, mosi, miso, cs, irq, rst, gpio)**  
