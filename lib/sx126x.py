@@ -1079,6 +1079,8 @@ class SX126X:
         return data[0]
 
     def setTxParams(self, power, rampTime=SX126X_PA_RAMP_200U):
+        if power < 0:
+            power += 256
         data = [power, rampTime]
         return self.SPIwriteCommand([SX126X_CMD_SET_TX_PARAMS], 1, data, 2)
 
