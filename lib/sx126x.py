@@ -128,6 +128,7 @@ class SX126X:
             state = self.setRegulatorLDO()
         else:
             state = self.setRegulatorDCDC()
+        ASSERT(state)
 
         state = self.setSpreadingFactor(sf)
         ASSERT(state)
@@ -180,6 +181,7 @@ class SX126X:
             state = self.setRegulatorLDO()
         else:
             state = self.setRegulatorDCDC()
+        ASSERT(state)
 
         state = self.setBitRate(br)
         ASSERT(state)
