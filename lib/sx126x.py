@@ -116,13 +116,19 @@ class SX126X:
 
         state = self.standby()
         ASSERT(state)
-
-        state = self.config(SX126X_PACKET_TYPE_LORA)
-        ASSERT(state)
-
+        
         if tcxoVoltage > 0.0:
             state = self.setTCXO(tcxoVoltage)
             ASSERT(state)
+
+        state = self.config(SX126X_PACKET_TYPE_LORA)
+        ASSERT(state)
+        
+        if useRegulatorLDO:
+            state = self.setRegulatorLDO()
+        else:
+            state = self.setRegulatorDCDC()
+        ASSERT(state)
 
         state = self.setSpreadingFactor(sf)
         ASSERT(state)
@@ -145,11 +151,6 @@ class SX126X:
         state = self.setDio2AsRfSwitch(True)
         ASSERT(state)
 
-        if useRegulatorLDO:
-            state = self.setRegulatorLDO()
-        else:
-            state = self.setRegulatorDCDC()
-
         return state
 
     def beginFSK(self, br, freqDev, rxBw, currentLimit, preambleLength, dataShaping, preambleDetectorLength, tcxoVoltage, useRegulatorLDO=False):
@@ -168,13 +169,19 @@ class SX126X:
 
         state = self.standby()
         ASSERT(state)
-
-        state = self.config(SX126X_PACKET_TYPE_GFSK)
-        ASSERT(state)
-
+        
         if tcxoVoltage > 0.0:
             state = self.setTCXO(tcxoVoltage)
             ASSERT(state)
+
+        state = self.config(SX126X_PACKET_TYPE_GFSK)
+        ASSERT(state)
+        
+        if useRegulatorLDO:
+            state = self.setRegulatorLDO()
+        else:
+            state = self.setRegulatorDCDC()
+        ASSERT(state)
 
         state = self.setBitRate(br)
         ASSERT(state)
@@ -206,11 +213,6 @@ class SX126X:
 
         state = self.setDio2AsRfSwitch(True)
         ASSERT(state)
-
-        if useRegulatorLDO:
-            state = self.setRegulatorLDO()
-        else:
-            state = self.setRegulatorDCDC()
 
         return state
 
