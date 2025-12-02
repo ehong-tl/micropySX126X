@@ -319,21 +319,31 @@ class SX126X:
         ASSERT(state)
 
         start = ticks_us()
-        while not self.irq.value():
-            yield_()
-            if timeout_en:
-                if abs(ticks_diff(start, ticks_us())) > timeout:
-                    self.fixImplicitTimeout()
-                    self.clearIrqStatus()
-                    self.standby()
-                    return ERR_RX_TIMEOUT
+        if implementation.name == 'micropython':
+            while not self.irq.value():
+                yield_()
+                if timeout_en:
+                    if abs(ticks_diff(start, ticks_us())) > timeout:
+                        self.fixImplicitTimeout()
+                        self.clearIrqStatus()
+                        self.standby()
+                        return ERR_RX_TIMEOUT
+        if implementation.name == 'circuitpython':
+            while not self.irq.value:
+                yield_()
+                if timeout_en:
+                    if abs(ticks_diff(start, ticks_us())) > timeout:
+                        self.fixImplicitTimeout()
+                        self.clearIrqStatus()
+                        self.standby()
+                        return ERR_RX_TIMEOUT
 
         if self._headerType == SX126X_LORA_HEADER_IMPLICIT and self.getPacketType() == SX126X_PACKET_TYPE_LORA:
             state = self.fixImplicitTimeout()
             ASSERT(state)
 
         return self.readData(data, len_)
-
+        
     def transmitDirect(self, frf=0):
         state = ERR_NONE
         if frf != 0:
@@ -400,6 +410,7 @@ class SX126X:
           self.irq = Pin(self._irq, mode=Pin.IN)
 
         if implementation.name == 'circuitpython':
+          self.irq.deinit()
           self.irq = digitalio.DigitalInOut(self._irq)
           self.irq.switch_to_input()
 
