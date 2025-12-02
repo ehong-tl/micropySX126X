@@ -343,7 +343,7 @@ class SX126X:
             ASSERT(state)
 
         return self.readData(data, len_)
-        
+
     def transmitDirect(self, frf=0):
         state = ERR_NONE
         if frf != 0:
