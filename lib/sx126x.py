@@ -268,12 +268,20 @@ class SX126X:
         ASSERT(state)
 
         start = ticks_us()
-        while not self.irq.value():
-            yield_()
-            if abs(ticks_diff(start, ticks_us())) > timeout:
-                self.clearIrqStatus()
-                self.standby()
-                return ERR_TX_TIMEOUT
+        if implementation.name == 'micropython':
+            while not self.irq.value():
+                yield_()
+                if abs(ticks_diff(start, ticks_us())) > timeout:
+                    self.clearIrqStatus()
+                    self.standby()
+                    return ERR_TX_TIMEOUT
+        if implementation.name == 'circuitpython':
+            while not self.irq.value:
+                yield_()
+                if abs(ticks_diff(start, ticks_us())) > timeout:
+                    self.clearIrqStatus()
+                    self.standby()
+                    return ERR_TX_TIMEOUT                     
 
         elapsed = abs(ticks_diff(start, ticks_us()))
 
@@ -372,8 +380,13 @@ class SX126X:
         state = self.setCad()
         ASSERT(state)
 
-        while not self.irq.value():
-            yield_()
+        if implementation.name == 'micropython':
+            while not self.irq.value():
+                yield_()
+        if implementation.name == 'circuitpython':
+            while not self.irq.value:
+                yield_()
+        
 
         cadResult = self.getIrqStatus()
         if cadResult & SX126X_IRQ_CAD_DETECTED:
